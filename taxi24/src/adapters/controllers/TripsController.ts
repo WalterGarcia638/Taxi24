@@ -5,9 +5,10 @@ import { Trip } from '../../domain/entities/Trip';
 import { GetActiveTripsUseCase } from 'src/application/use-cases/trips/GetActiveTripsUseCase';
 import { CreateTripDto } from '../dto/Trip/CreateTripDto';
 import { UpdateTripDto } from '../dto/Trip/UpdateTripDto';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express'; 
 
+@ApiTags('Trips')
 @Controller('trips')
 export class TripsController {
   constructor(
