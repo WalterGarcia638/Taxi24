@@ -1,4 +1,3 @@
-// src/application/use-cases/passengers/GetPassengerByIdUseCase.ts
 import { PassengerRepository } from '../../ports/PassengerRepository';
 import { Passenger } from '../../../domain/entities/Passenger';
 

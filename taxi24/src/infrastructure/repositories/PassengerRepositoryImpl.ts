@@ -1,4 +1,3 @@
-// src/infrastructure/repositories/PassengerRepositoryImpl.ts
 import { PassengerRepository } from '../../application/ports/PassengerRepository';
 import { Passenger } from '../../domain/entities/Passenger';
 import { Injectable } from '@nestjs/common';

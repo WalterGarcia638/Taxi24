@@ -1,4 +1,3 @@
-// src/infrastructure/repositories/DriverRepositoryImpl.ts
 import { DriverRepository } from '../../application/ports/DriverRepository';
 import { Driver } from '../../domain/entities/Driver';
 import { DriverEntity } from '../entities/DriverEntity';
@@ -27,40 +26,36 @@ export class DriverRepositoryImpl implements DriverRepository {
     const entities = await this.driverRepository.find({ where: { status: 'available' } });
     return entities.map(entity => this.toDomain(entity));
   }
-
-  /*async findAvailableDriversNearLocation(
+  async findAvailableDriversNearLocation(
     latitude: number,
     longitude: number,
     radiusKm: number,
   ): Promise<Driver[]> {
-    const radiusMeters = radiusKm * 1000;
-    const entities = await this.driverRepository
+    const drivers = await this.driverRepository
       .createQueryBuilder('driver')
+      .addSelect(
+        `haversine(${latitude}, ${longitude}, driver.latitude, driver.longitude)`,
+        'distance',
+      )
       .where('driver.status = :status', { status: 'available' })
       .andWhere(
-        `earth_distance(ll_to_earth(driver.latitude, driver.longitude), ll_to_earth(:lat, :lng)) <= :radius`,
-        { lat: latitude, lng: longitude, radius: radiusMeters },
+        `haversine(${latitude}, ${longitude}, driver.latitude, driver.longitude) <= :radius`,
+        { radius: radiusKm },
       )
-      .getMany();
-
-    return entities.map(entity => this.toDomain(entity));
-  }*/
-
-  async findAvailableDriversNearLocation(latitude: number, longitude: number): Promise<DriverEntity[]> {
-    return this.driverRepository
-      .createQueryBuilder('driver')
-      .select([
-        'driver.id',
-        'driver.name',
-        'driver.latitude',
-        'driver.longitude',
-        `haversine(${latitude}, ${longitude}, driver.latitude, driver.longitude) AS distance`,
-      ])
-      .where('driver.status = :status', { status: 'available' })
       .orderBy('distance', 'ASC')
-      .limit(10)
       .getRawMany();
+  
+    return drivers.map((driver: any) =>
+      this.toDomain({
+        id: driver.driver_id,
+        name: driver.driver_name,
+        latitude: driver.driver_latitude,
+        longitude: driver.driver_longitude,
+        status: driver.driver_status,
+      }),
+    );
   }
+  
 
   private toDomain(entity: DriverEntity): Driver {
     return new Driver(entity.id, entity.name, entity.latitude, entity.longitude, entity.status);

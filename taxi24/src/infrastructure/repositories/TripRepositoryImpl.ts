@@ -1,4 +1,3 @@
-// src/infrastructure/repositories/TripRepositoryImpl.ts
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -17,6 +16,17 @@ export class TripRepositoryImpl implements TripRepository {
     @InjectRepository(TripEntity)
     private tripRepository: Repository<TripEntity>,
   ) {}
+  async findOne(conditions: Partial<Trip>): Promise<Trip | null> {
+    const tripEntity = await this.tripRepository.findOne({
+      where: conditions,
+      relations: ['driver', 'passenger'], 
+    });
+    if (!tripEntity) {
+      return null;
+    }
+    return this.toDomain(tripEntity); 
+  }
+    
 
   async createTrip(trip: Trip): Promise<Trip> {
     const tripEntity = this.toEntity(trip);
@@ -24,14 +34,17 @@ export class TripRepositoryImpl implements TripRepository {
     return this.toDomain(savedEntity);
   }
 
-  async completeTrip(id: number): Promise<Trip | null> {
+  async completeTrip(id: number, endLatitude: number, endLongitude: number, fare: number): Promise<Trip | null> {
     const tripEntity = await this.tripRepository.findOne({
       where: { id },
       relations: ['driver', 'passenger'],
     });
     if (tripEntity) {
-      tripEntity.status = TripStatus.COMPLETED as string; // Usar el Enum y convertirlo a string
+      tripEntity.status = TripStatus.COMPLETED as string; 
       tripEntity.endTime = new Date();
+      tripEntity.endLatitude = endLatitude;
+      tripEntity.endLongitude = endLongitude;
+      tripEntity.fare = fare;
       const updatedEntity = await this.tripRepository.save(tripEntity);
       return this.toDomain(updatedEntity);
     }
@@ -41,18 +54,31 @@ export class TripRepositoryImpl implements TripRepository {
 
   async findActiveTrips(): Promise<Trip[]> {
     const entities = await this.tripRepository.find({
-      where: { status: TripStatus.ACTIVE as string }, // Usar el Enum y convertirlo a string
+      where: { status: TripStatus.ACTIVE as string }, 
       relations: ['driver', 'passenger'],
     });
     return entities.map(entity => this.toDomain(entity));
   }
-  
+
+
+
+async findById(id: number): Promise<Trip | null> {
+    const tripEntity = await this.tripRepository.findOne({
+      where: { id },
+      relations: ['driver', 'passenger'],
+    });
+    if (!tripEntity) {
+      return null;
+    }
+    return this.toDomain(tripEntity);
+    
+  }
 
   private toEntity(trip: Trip): TripEntity {
     const tripEntity = new TripEntity();
   
     if (trip.id) {
-      tripEntity.id = trip.id; // Solo asignar si es una actualización
+      tripEntity.id = trip.id; 
     }
   
     tripEntity.passenger = new PassengerEntity();

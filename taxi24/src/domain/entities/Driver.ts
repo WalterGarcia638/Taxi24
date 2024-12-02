@@ -1,4 +1,3 @@
-// src/domain/entities/Driver.ts
 export class Driver {
     constructor(
       public id: number,

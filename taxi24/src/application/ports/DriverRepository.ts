@@ -1,4 +1,3 @@
-// src/application/ports/DriverRepository.ts
 import { Driver } from '../../domain/entities/Driver';
 
 export interface DriverRepository {

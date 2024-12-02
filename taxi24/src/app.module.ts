@@ -34,6 +34,7 @@ import { GetAllPassengersUseCase } from './application/use-cases/passengers/GetA
 import { TripRepository } from './application/ports/TripRepository';
 import { PassengerRepository } from './application/ports/PassengerRepository';
 import { DriverRepository } from './application/ports/DriverRepository';
+import { GetDriverByIdUseCase } from './application/use-cases/drivers/GetDriverByIdUseCase';
 
 @Module({
   imports: [
@@ -101,10 +102,41 @@ import { DriverRepository } from './application/ports/DriverRepository';
       useFactory: (tripRepo) => new GetActiveTripsUseCase(tripRepo),
       inject: ['TripRepository'],
     },
+    /*{
+        provide: GenerateInvoiceUseCase,
+        useFactory: (invoiceRepo) => new GenerateInvoiceUseCase(invoiceRepo),
+        inject: ['InvoiceRepository'],
+      },*/
+      {
+        provide: GenerateInvoiceUseCase,
+        useFactory: (invoiceRepo, tripRepo) =>
+          new GenerateInvoiceUseCase(invoiceRepo, tripRepo),
+        inject: ['InvoiceRepository', 'TripRepository'],
+      },
+      {
+        provide: 'DriverRepository',
+        useClass: DriverRepositoryImpl,
+      },
+      {
+        provide: GetAvailableDriversNearLocationUseCase,
+        useFactory: (driverRepo) => new GetAvailableDriversNearLocationUseCase(driverRepo),
+        inject: ['DriverRepository'],
+      },
+      {
+        provide: GetDriverByIdUseCase,
+        useFactory: (driverRepo) => new GetDriverByIdUseCase(driverRepo),
+        inject: ['DriverRepository'],
+      },
+
+      
+      
     {
-      provide: GenerateInvoiceUseCase,
-      useFactory: (invoiceRepo) => new GenerateInvoiceUseCase(invoiceRepo),
-      inject: ['InvoiceRepository'],
+      provide: 'TripRepository',
+      useClass: TripRepositoryImpl,
+    },
+    {
+      provide: 'InvoiceRepository',
+      useClass: InvoiceRepositoryImpl,
     },
     {
       provide: GetInvoiceByIdUseCase,

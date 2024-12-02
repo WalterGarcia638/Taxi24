@@ -1,5 +1,4 @@
-// src/infrastructure/repositories/InvoiceRepositoryImpl.ts
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InvoiceRepository } from '../../application/ports/InvoiceRepository';
@@ -10,24 +9,40 @@ import { Driver } from '../../domain/entities/Driver';
 import { InvoiceEntity } from '../entities/Invoice';
 import { TripEntity } from '../entities/Trip';
 import { TripStatus } from 'src/adapters/enums/TripStatus';
+import { TripRepository } from 'src/application/ports/TripRepository';
 
 @Injectable()
 export class InvoiceRepositoryImpl implements InvoiceRepository {
   constructor(
     @InjectRepository(InvoiceEntity)
     private invoiceRepository: Repository<InvoiceEntity>,
+
+    @InjectRepository(TripEntity)
+    private tripRepository: Repository<TripEntity>, 
   ) {}
 
   async createInvoice(invoice: Invoice): Promise<Invoice> {
-    // Convertir la entidad de dominio a entidad de infraestructura
-    const invoiceEntity = this.toEntity(invoice);
-
-    // Guardar la entidad en la base de datos
-    const savedEntity = await this.invoiceRepository.save(invoiceEntity);
-
-    // Retornar la entidad de dominio resultante
-    return this.toDomain(savedEntity);
+    const existingInvoice = await this.findByTripId(invoice.trip.id);
+  
+    if (existingInvoice) {
+      throw new Error('Invoice already exists for this trip.');
+    }
+  
+    const invoiceEntity = await this.toEntity(invoice);
+    console.log('Existing invoice:', existingInvoice);
+  
+    try {
+      const savedEntity = await this.invoiceRepository.save(invoiceEntity);
+      return this.toDomain(savedEntity);
+    } catch (error) {
+      if (error.code === '23505') { 
+        throw new Error('Duplicate entry for trip_id in invoices table.');
+      }
+      throw error;
+    }
   }
+  
+  
 
   async findById(id: number): Promise<Invoice | null> {
     const invoiceEntity = await this.invoiceRepository.findOne({
@@ -40,16 +55,36 @@ export class InvoiceRepositoryImpl implements InvoiceRepository {
     return null;
   }
 
+async findByTripId(tripId: number): Promise<Invoice | null> {
+    const invoiceEntity = await this.invoiceRepository.findOne({
+      where: { trip: { id: tripId } },
+      relations: ['trip'],
+    });
+    if (!invoiceEntity) {
+      return null;
+    }
+    console.log('Finding invoice for tripId:', tripId);
+    return this.toDomain(invoiceEntity);
+  }
+  
+
   private toDomain(entity: InvoiceEntity): Invoice {
+    if (!entity.trip) {
+      throw new Error(`Invoice ${entity.id} does not have a trip.`);
+    }
+    if (!entity.trip.passenger) {
+      throw new Error(`Trip ${entity.trip.id} does not have a passenger.`);
+    }
+    if (!entity.trip.driver) {
+      throw new Error(`Trip ${entity.trip.id} does not have a driver.`);
+    }
+
     const tripEntity = entity.trip;
     const trip = new Trip(
       tripEntity.id,
-      // Mapear PassengerEntity a Passenger
-      new Passenger(
-        tripEntity.passenger.id,
-        tripEntity.passenger.name,
-      ),
-      // Mapear DriverEntity a Driver
+      tripEntity.passenger
+      ? new Passenger(tripEntity.passenger.id, tripEntity.passenger.name)
+      : null,
       new Driver(
         tripEntity.driver.id,
         tripEntity.driver.name,
@@ -74,16 +109,23 @@ export class InvoiceRepositoryImpl implements InvoiceRepository {
     );
   }
 
-  private toEntity(invoice: Invoice): InvoiceEntity {
+  private async toEntity(invoice: Invoice): Promise<InvoiceEntity> {
     const invoiceEntity = new InvoiceEntity();
-    invoiceEntity.id = invoice.id;
     invoiceEntity.amount = invoice.amount;
     invoiceEntity.generatedAt = invoice.generatedAt;
-
-    // Mapear el Trip asociado
-    invoiceEntity.trip = new TripEntity();
-    invoiceEntity.trip.id = invoice.trip.id;
-
+  
+    const tripEntity = await this.tripRepository.findOne({
+      where: { id: invoice.trip.id },
+    });
+  
+    if (!tripEntity) {
+      throw new Error(`Trip with id ${invoice.trip.id} not found`);
+    }
+  
+    invoiceEntity.trip = tripEntity;
+  
     return invoiceEntity;
   }
+
+ 
 }

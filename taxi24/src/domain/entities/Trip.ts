@@ -1,4 +1,3 @@
-// src/domain/entities/Trip.ts
 import { TripStatus } from 'src/adapters/enums/TripStatus';
 import { Driver } from './Driver';
 import { Passenger } from './Passenger';

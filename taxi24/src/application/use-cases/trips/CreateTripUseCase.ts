@@ -27,7 +27,7 @@ export class CreateTripUseCase {
         0,
         passenger,
         driver,
-        input.status || TripStatus.ACTIVE,  // Usar "active" como predeterminado si no se proporciona
+        input.status || TripStatus.ACTIVE,
         new Date(),
         null,
         input.startLatitude,

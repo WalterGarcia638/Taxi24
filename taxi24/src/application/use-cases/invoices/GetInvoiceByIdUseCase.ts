@@ -1,4 +1,3 @@
-// src/application/use-cases/invoices/GetInvoiceByIdUseCase.ts
 import { InvoiceRepository } from '../../ports/InvoiceRepository';
 import { Invoice } from '../../../domain/entities/Invoice';
 

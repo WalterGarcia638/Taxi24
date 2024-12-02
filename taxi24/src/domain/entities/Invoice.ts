@@ -1,4 +1,3 @@
-// src/domain/entities/Invoice.ts
 import { Trip } from './Trip';
 
 export class Invoice {

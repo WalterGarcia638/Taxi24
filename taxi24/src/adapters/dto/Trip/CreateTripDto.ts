@@ -20,5 +20,5 @@ export class CreateTripDto {
 
   @IsOptional()
   @IsString()
-  status?: TripStatus; // El estado es opcional
+  status?: TripStatus;
 }

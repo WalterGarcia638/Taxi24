@@ -10,13 +10,20 @@ export class CompleteTripUseCase {
     private generateInvoiceUseCase: GenerateInvoiceUseCase,
   ) {}
 
-  async execute(tripId: number): Promise<Trip | null> {
-    const trip = await this.tripRepository.completeTrip(tripId);
-    if (trip) {
-      // Generar la factura
-      await this.generateInvoiceUseCase.execute(trip);
-      return trip;
+  async execute(tripId: number, endLatitude: number, endLongitude: number, fare: number): Promise<Trip | null> {
+    const trip = await this.tripRepository.completeTrip(tripId, endLatitude, endLongitude, fare);
+    if (!trip) {
+      throw new Error('Trip not found.');
     }
-    return null;
+  
+    if (!trip.endLatitude || !trip.endLongitude) {
+      throw new Error('Cannot complete trip: Missing end coordinates.');
+    }
+  
+    await this.generateInvoiceUseCase.execute(trip.id);
+  
+    return trip;
   }
+  
+  
 }

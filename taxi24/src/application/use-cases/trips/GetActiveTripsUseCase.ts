@@ -1,4 +1,3 @@
-// src/application/use-cases/trips/GetActiveTripsUseCase.ts
 import { TripRepository } from '../../ports/TripRepository';
 import { Trip } from '../../../domain/entities/Trip';
 

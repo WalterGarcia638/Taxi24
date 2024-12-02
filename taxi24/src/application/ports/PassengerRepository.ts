@@ -1,4 +1,3 @@
-// src/application/ports/PassengerRepository.ts
 import { Passenger } from '../../domain/entities/Passenger';
 
 export interface PassengerRepository {
