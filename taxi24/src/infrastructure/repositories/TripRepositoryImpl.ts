@@ -9,6 +9,7 @@ import { Passenger } from 'src/domain/entities/Passenger';
 import { Driver } from 'src/domain/entities/Driver';
 import { TripEntity } from '../entities/Trip';
 import { PassengerEntity } from '../entities/Passenger';
+import { TripStatus } from 'src/adapters/enums/TripStatus';
 
 @Injectable()
 export class TripRepositoryImpl implements TripRepository {
@@ -29,30 +30,36 @@ export class TripRepositoryImpl implements TripRepository {
       relations: ['driver', 'passenger'],
     });
     if (tripEntity) {
-      tripEntity.status = 'completed';
+      tripEntity.status = TripStatus.COMPLETED as string; // Usar el Enum y convertirlo a string
       tripEntity.endTime = new Date();
       const updatedEntity = await this.tripRepository.save(tripEntity);
       return this.toDomain(updatedEntity);
     }
     return null;
   }
+  
 
   async findActiveTrips(): Promise<Trip[]> {
     const entities = await this.tripRepository.find({
-      where: { status: 'active' },
+      where: { status: TripStatus.ACTIVE as string }, // Usar el Enum y convertirlo a string
       relations: ['driver', 'passenger'],
     });
     return entities.map(entity => this.toDomain(entity));
   }
+  
 
   private toEntity(trip: Trip): TripEntity {
     const tripEntity = new TripEntity();
-    tripEntity.id = trip.id;
+  
+    if (trip.id) {
+      tripEntity.id = trip.id; // Solo asignar si es una actualización
+    }
+  
     tripEntity.passenger = new PassengerEntity();
     tripEntity.passenger.id = trip.passenger.id;
     tripEntity.driver = new DriverEntity();
     tripEntity.driver.id = trip.driver.id;
-    tripEntity.status = trip.status;
+    tripEntity.status = trip.status.toString();
     tripEntity.startTime = trip.startTime;
     tripEntity.endTime = trip.endTime;
     tripEntity.startLatitude = trip.startLatitude;
@@ -60,8 +67,10 @@ export class TripRepositoryImpl implements TripRepository {
     tripEntity.endLatitude = trip.endLatitude;
     tripEntity.endLongitude = trip.endLongitude;
     tripEntity.fare = trip.fare;
+  
     return tripEntity;
   }
+  
 
   private toDomain(entity: TripEntity): Trip {
     return new Trip(
@@ -74,7 +83,7 @@ export class TripRepositoryImpl implements TripRepository {
         entity.driver.longitude,
         entity.driver.status,
       ),
-      entity.status,
+      entity.status as TripStatus,
       entity.startTime,
       entity.endTime,
       entity.startLatitude,

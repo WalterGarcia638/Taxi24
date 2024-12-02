@@ -28,12 +28,11 @@ export class DriverRepositoryImpl implements DriverRepository {
     return entities.map(entity => this.toDomain(entity));
   }
 
-  async findAvailableDriversNearLocation(
+  /*async findAvailableDriversNearLocation(
     latitude: number,
     longitude: number,
     radiusKm: number,
   ): Promise<Driver[]> {
-    // Asumiendo que tenemos la extensión earthdistance habilitada en PostgreSQL
     const radiusMeters = radiusKm * 1000;
     const entities = await this.driverRepository
       .createQueryBuilder('driver')
@@ -45,6 +44,22 @@ export class DriverRepositoryImpl implements DriverRepository {
       .getMany();
 
     return entities.map(entity => this.toDomain(entity));
+  }*/
+
+  async findAvailableDriversNearLocation(latitude: number, longitude: number): Promise<DriverEntity[]> {
+    return this.driverRepository
+      .createQueryBuilder('driver')
+      .select([
+        'driver.id',
+        'driver.name',
+        'driver.latitude',
+        'driver.longitude',
+        `haversine(${latitude}, ${longitude}, driver.latitude, driver.longitude) AS distance`,
+      ])
+      .where('driver.status = :status', { status: 'available' })
+      .orderBy('distance', 'ASC')
+      .limit(10)
+      .getRawMany();
   }
 
   private toDomain(entity: DriverEntity): Driver {

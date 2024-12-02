@@ -4,6 +4,7 @@ import { CreateTripUseCase } from '../../application/use-cases/trips/CreateTripU
 import { CompleteTripUseCase } from '../../application/use-cases/trips/CompleteTripUseCase';
 import { Trip } from '../../domain/entities/Trip';
 import { GetActiveTripsUseCase } from 'src/application/use-cases/trips/GetActiveTripsUseCase';
+import { CreateTripDto } from '../dto/Trip/CreateTripDto';
 
 @Controller('trips')
 export class TripsController {
@@ -13,11 +14,11 @@ export class TripsController {
     private readonly getActiveTripsUseCase: GetActiveTripsUseCase,
   ) {}
 
-  @Post()
+  /*@Post()
   async createTrip(@Body() tripData): Promise<Trip> {
-    // Mapear tripData a una instancia de Trip
+    
     const trip = new Trip(
-      0, // Se generará automáticamente
+      0, 
       tripData.passenger,
       tripData.driver,
       'active',
@@ -28,6 +29,13 @@ export class TripsController {
     );
     return await this.createTripUseCase.execute(trip);
   }
+*/
+
+@Post()
+async createTrip(@Body() createTripDto: CreateTripDto): Promise<Trip> {
+  // Simplemente pasa los datos al caso de uso
+  return await this.createTripUseCase.execute(createTripDto);
+}
 
   @Patch(':id/complete')
   async completeTrip(@Param('id') id: number): Promise<Trip | null> {

@@ -31,6 +31,9 @@ import { GetAvailableDriversNearLocationUseCase } from './application/use-cases/
 import { InvoicesController } from './adapters/controllers/InvoicesController';
 import { PassengersController } from './adapters/controllers/PassengersController';
 import { GetAllPassengersUseCase } from './application/use-cases/passengers/GetAllPassengersUseCase';
+import { TripRepository } from './application/ports/TripRepository';
+import { PassengerRepository } from './application/ports/PassengerRepository';
+import { DriverRepository } from './application/ports/DriverRepository';
 
 @Module({
   imports: [
@@ -73,10 +76,19 @@ import { GetAllPassengersUseCase } from './application/use-cases/passengers/GetA
       useFactory: (driverRepo) => new GetAllDriversUseCase(driverRepo),
       inject: ['DriverRepository'],
     },
-    {
+   /* {
       provide: CreateTripUseCase,
       useFactory: (tripRepo) => new CreateTripUseCase(tripRepo),
       inject: ['TripRepository'],
+    },*/
+    {
+      provide: CreateTripUseCase,
+      useFactory: (
+        tripRepo: TripRepository,
+        passengerRepo: PassengerRepository,
+        driverRepo: DriverRepository,
+      ) => new CreateTripUseCase(tripRepo, passengerRepo, driverRepo),
+      inject: ['TripRepository', 'PassengerRepository', 'DriverRepository'],
     },
     {
       provide: CompleteTripUseCase,

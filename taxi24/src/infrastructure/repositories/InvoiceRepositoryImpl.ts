@@ -9,6 +9,7 @@ import { Passenger } from '../../domain/entities/Passenger';
 import { Driver } from '../../domain/entities/Driver';
 import { InvoiceEntity } from '../entities/Invoice';
 import { TripEntity } from '../entities/Trip';
+import { TripStatus } from 'src/adapters/enums/TripStatus';
 
 @Injectable()
 export class InvoiceRepositoryImpl implements InvoiceRepository {
@@ -56,7 +57,7 @@ export class InvoiceRepositoryImpl implements InvoiceRepository {
         tripEntity.driver.longitude,
         tripEntity.driver.status,
       ),
-      tripEntity.status,
+      tripEntity.status as TripStatus,
       tripEntity.startTime,
       tripEntity.endTime,
       tripEntity.startLatitude,

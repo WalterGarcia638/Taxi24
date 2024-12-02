@@ -1,13 +1,14 @@
 // src/domain/entities/Trip.ts
+import { TripStatus } from 'src/adapters/enums/TripStatus';
 import { Driver } from './Driver';
 import { Passenger } from './Passenger';
 
 export class Trip {
   constructor(
-    public id: number,
+    public id: number | null,
     public passenger: Passenger,
     public driver: Driver,
-    public status: 'active' | 'completed' = 'active',
+    public status: TripStatus,
     public startTime: Date = new Date(),
     public endTime?: Date,
     public startLatitude?: number,
