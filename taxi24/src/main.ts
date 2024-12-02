@@ -1,9 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { DataSource } from 'typeorm';
+import { seedData } from './seed';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const dataSource = app.get(DataSource);
+  await seedData(dataSource);
 
   app.enableCors({
     origin: '*', // Permite todas las solicitudes de cualquier origen (puedes restringirlo según sea necesario)
