@@ -26,7 +26,7 @@ Asegúrate de tener las siguientes herramientas instaladas en tu máquina:
     ```
 2. Ve al directorio del proyecto:
   ```
-cd taxi24
+   cd taxi24
 ```
 
 4. Instala las dependencias:
@@ -36,11 +36,11 @@ cd taxi24
 
 6. Configura el archivo de entorno .env: Crea un archivo .env en la raíz del proyecto con las siguientes variables:
 ```
-DATABASE_HOST=localhost
-DATABASE_PORT=5432
-DATABASE_USERNAME=postgres
-DATABASE_PASSWORD=tu-contraseña
-DATABASE_NAME=taxi24
+   DATABASE_HOST=localhost
+   DATABASE_PORT=5432
+   DATABASE_USERNAME=postgres
+   DATABASE_PASSWORD=tu-contraseña
+   DATABASE_NAME=taxi24
 ```
 
 5. Iniciar el servidor en desarrollo
@@ -57,17 +57,17 @@ DATABASE_NAME=taxi24
 
 7. Estructura del proyecto
   ```
-src/
-├── adapters/
-│   ├── controllers/         # Controladores de la API
-│   ├── dto/                 # Data Transfer Objects (DTOs)
-├── application/
-│   ├── use-cases/           # Casos de uso
-│   ├── ports/               # Interfaces de repositorios
-├── domain/
-│   ├── entities/            # Entidades del dominio
-├── infrastructure/
-│   ├── repositories/        # Implementaciones de los repositorios
-├── main.ts                  # Punto de entrada de la aplicación
-test/                        # Pruebas unitarias
+   src/
+   ├── adapters/
+   │   ├── controllers/         # Controladores de la API
+   │   ├── dto/                 # Data Transfer Objects (DTOs)
+   ├── application/
+   │   ├── use-cases/           # Casos de uso
+   │   ├── ports/               # Interfaces de repositorios
+   ├── domain/
+   │   ├── entities/            # Entidades del dominio
+   ├── infrastructure/
+   │   ├── repositories/        # Implementaciones de los repositorios
+   ├── main.ts                  # Punto de entrada de la aplicación
+   test/                        # Pruebas unitarias
 ```
