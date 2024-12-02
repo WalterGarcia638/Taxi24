@@ -25,12 +25,16 @@ Asegúrate de tener las siguientes herramientas instaladas en tu máquina:
    git clone https://github.com/tu-usuario/taxi24.git
     ```
 2. Ve al directorio del proyecto:
-  ```cd taxi24```
+  ```
+cd taxi24
+```
 
-3. Instala las dependencias:
-   ```npm install```
+4. Instala las dependencias:
+   ```
+   npm install
+   ```
 
-4. Configura el archivo de entorno .env: Crea un archivo .env en la raíz del proyecto con las siguientes variables:
+6. Configura el archivo de entorno .env: Crea un archivo .env en la raíz del proyecto con las siguientes variables:
 ```
 DATABASE_HOST=localhost
 DATABASE_PORT=5432
